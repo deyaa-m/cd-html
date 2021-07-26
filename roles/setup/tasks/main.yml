@@ -1,0 +1,40 @@
+---
+- name: wait for server to be reachable
+  wait_for_connection:
+    delay: 10
+    sleep: 10
+    #connect_timeout: 3
+    timeout: 300
+  
+- name: "update apt packages."
+  become: yes
+  apt:
+    update_cache: yes
+
+- name: install apache
+  become: yes
+  apt:
+    name: apache2
+    state: present
+
+#- name: create udacity directory
+#  file: 
+#    path: ~/udacity
+#    state: directory
+    
+- name: "index copy"
+  copy:
+    src: index.html
+    dest: /var/www/html/index.html
+
+#- name: install http server
+#  become: yes
+#  npm:
+#    name: http-server
+#    state: present
+
+#- name: "upgrade packages"
+#  become: yes
+#  yum:
+#    name: '*'
+#    state: latest
