@@ -4,33 +4,65 @@ version: 2.1
 orbs:
   aws-cli: circleci/aws-cli@2.0.3
 
-commands:
-  destroy:
-    steps:
-      - run:
-          name: Destroy stack
-          command: aws cloudformation delete-stack --stack-name bucket
-          when: on_fail
+#commands:
+#  destroy:
+#    steps:
+#      - run:
+#          name: Destroy stack
+#          command: aws cloudformation delete-stack --stack-name bucket
+#          when: on_fail
 jobs:
+  verify-old:
+    docker:
+      - image: python:3.7
+    steps:
+      - aws-cli/install
+      - aws cloudformation list-exports --query "Exports[?Name==\`PipelineID\`].Value" --output text > ~/tmp/old-version
+      - persist_to_workspace:
+          root: ~/tmp
+          paths:
+            - old-version
   Bucket:
     docker:
       - image: python:3.7
     environment:
-      name: bucket
+      name: ${CIRCLE_WORKFLOW_ID:0:6}
     steps:
       - checkout
       - aws-cli/install
-      #aws cloudformation deploy --template-file bucket.yaml --stack-name bucket --parameter --parameterKey=NAME,ParameterValue=
-      - run: aws cloudformation create-stack --stack-name ${name} --template-body file://bucket.yaml --parameters ParameterKey=NAME,ParameterValue=${CIRCLE_WORKFLOW_ID:0:6}
+      - run: aws cloudformation create-stack --stack-name bucket-${name} --template-body file://bucket.yaml --parameters ParameterKey=NAME,ParameterValue=${name}
       - run: aws cloudformation wait stack-create-complete --stack-name ${name}
-      - destroy 
+      #- destroy 
  
-          
+  CDN:
+    docker:
+      - image: python:3.7
+    environment:
+      name: CDN
+    steps:
+      - checkout
+      - aws-cli/install
+      - run: aws cloudformation deploy --stack-name ${name} --template-file CDN.yaml --parameters ParameterKey=PipelineId,ParameterValue=${CIRCLE_WORKFLOW_ID:0:6}
+
+  clean-old:
+    docker:
+      - image: python:3.7
+    steps:
+      - aws-cli/install
+      - attach_workspace:
+          at: ~/tmp
+      - aws cloudformation delete-stack --stack-name $(cat ~/tmp/old-version)
+
 workflows:
   html:
     jobs:
-      - Bucket
-  #    - CDN:
-  #        requires:
-  #          - Bucket
-
+      - verify-old
+      - Bucket:
+          requires:
+            - verify-old
+      - CDN:
+          requires:
+            - Bucket
+      - clean-old:
+          requires:
+            - Bucket
