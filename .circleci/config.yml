@@ -45,6 +45,7 @@ jobs:
       - checkout
       - aws-cli/install
       - run: aws cloudformation create-stack --stack-name ${name} --template-body file://CDN.yaml --parameters ParameterKey=PipelineId,ParameterValue=${CIRCLE_WORKFLOW_ID:0:6}
+      - when: on_fail
 
   CDN-update:
     docker:
@@ -68,15 +69,10 @@ jobs:
 workflows:
   html:
     jobs:
-      - verify-old:
-          jobs:
-            - Bucket:
-              when: on_fail
-            - CDN-old:
-              when: on_fail
+      - verify-old
       - Bucket:
-          requires:
-            - verify-old
+        requires:
+          - verify-old
       - CDN-new:
           requires:
             - Bucket
