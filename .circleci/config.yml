@@ -21,7 +21,7 @@ jobs:
       - checkout
       - aws-cli/install
       #aws cloudformation deploy --template-file bucket.yaml --stack-name bucket --parameter --parameterKey=NAME,ParameterValue=
-      - run: aws cloudformation deploy --stack-name ${name} --template-body file://bucket.yaml --parameters ParameterKey=NAME,ParameterValue=${CIRCLE_WORKFLOW_ID:0:6}
+      - run: aws cloudformation create-stack --stack-name ${name} --template-body file://bucket.yaml --parameters ParameterKey=NAME,ParameterValue=${CIRCLE_WORKFLOW_ID:0:6}
       - run: aws cloudformation wait stack-create-complete --stack-name ${name}
       - destroy 
  
