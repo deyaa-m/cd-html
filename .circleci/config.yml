@@ -33,7 +33,7 @@ jobs:
       - aws-cli/install
       - run: aws cloudformation create-stack --stack-name "bucket-${CIRCLE_WORKFLOW_ID:0:6}" --template-body file://bucket.yaml --parameters ParameterKey=NAME,ParameterValue="${CIRCLE_WORKFLOW_ID:0:6}"
       - run: aws cloudformation wait stack-create-complete --stack-name "bucket-${CIRCLE_WORKFLOW_ID:0:6}"
-      - run: aws s3api put-object --bucket ${CIRCLE_WORKFLOW_ID:0:6} --key index.html --body index.html
+      - run: aws s3api put-object --bucket ${CIRCLE_WORKFLOW_ID:0:6} --key index.html --body ./index.html
       #- destroy 
  
   CDN:
@@ -44,7 +44,7 @@ jobs:
     steps:
       - checkout
       - aws-cli/install
-      - run: aws cloudformation deploy --stack-name ${name} --template-file CDN.yaml --parameters ParameterKey=PipelineId,ParameterValue=${CIRCLE_WORKFLOW_ID:0:6}
+      - run: aws cloudformation update-stack --stack-name ${name} --template-body file://CDN.yaml --parameters ParameterKey=PipelineId,ParameterValue=${CIRCLE_WORKFLOW_ID:0:6}
 
   clean-old:
     docker:
