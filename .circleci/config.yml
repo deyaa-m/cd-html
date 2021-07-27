@@ -51,7 +51,7 @@ jobs:
       - aws-cli/install
       - attach_workspace:
           at: ~/tmp
-      - aws cloudformation delete-stack --stack-name $(cat ~/tmp/old-version)
+      - run: aws cloudformation delete-stack --stack-name $(cat ~/tmp/old-version)
 
 workflows:
   html:
