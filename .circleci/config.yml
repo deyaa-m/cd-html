@@ -30,7 +30,7 @@ workflows:
   html:
     jobs:
       - Bucket
-      - CM:
-          requires:
-            - CF
+  #    - CDN:
+  #        requires:
+  #          - Bucket
 
