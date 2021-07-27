@@ -72,8 +72,11 @@ workflows:
     jobs:
       - verify-old
       - Bucket:
-        requires:
-          - verify-old
-      - CDN-new:
+          requires:
+            - verify-old
+      - CDN-update:
+          requires:
+            - Bucket
+      - clean-old:
           requires:
             - Bucket
