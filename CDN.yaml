@@ -33,3 +33,8 @@ Outputs:
     Value: !Sub ${PipelineID}
     Export:
       Name: PipelineID
+
+  cdnlink:
+    Value: !Ref WebpageCDN
+    Export:
+      Name: Link
