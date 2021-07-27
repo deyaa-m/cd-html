@@ -33,6 +33,7 @@ jobs:
       - aws-cli/install
       - run: aws cloudformation create-stack --stack-name "bucket-${CIRCLE_WORKFLOW_ID:0:6}" --template-body file://bucket.yaml --parameters ParameterKey=NAME,ParameterValue="${CIRCLE_WORKFLOW_ID:0:6}"
       - run: aws cloudformation wait stack-create-complete --stack-name "bucket-${CIRCLE_WORKFLOW_ID:0:6}"
+      - run: aws s3api put-object --bucket ${CIRCLE_WORKFLOW_ID:0:6} --key index.html --body index.html
       #- destroy 
  
   CDN:
@@ -52,7 +53,7 @@ jobs:
       - aws-cli/install
       - attach_workspace:
           at: ~/workspace
-      - run: aws cloudformation delete-stack --stack-name $(cat ~/workspace/old-version)
+      - run: cat ~/workspace/old-version | aws cloudformation delete-stack --stack-name -
 
 workflows:
   html:
