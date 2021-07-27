@@ -17,7 +17,7 @@ jobs:
       - image: python:3.7
     steps:
       - aws-cli/install
-      - aws cloudformation list-exports --query "Exports[?Name==\`PipelineID\`].Value" --output text > ~/tmp/old-version
+      - run: aws cloudformation list-exports --query "Exports[?Name==\`PipelineID\`].Value" --output text > ~/tmp/old-version
       - persist_to_workspace:
           root: ~/tmp
           paths:
