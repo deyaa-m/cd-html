@@ -31,8 +31,8 @@ jobs:
     steps:
       - checkout
       - aws-cli/install
-      - run: aws cloudformation create-stack --stack-name bucket-${name} --template-body file://bucket.yaml --parameters ParameterKey=NAME,ParameterValue=${CIRCLE_WORKFLOW_ID:0:6}
-      - run: aws cloudformation wait stack-create-complete --stack-name ${name}
+      - run: aws cloudformation create-stack --stack-name "bucket-${name}" --template-body file://bucket.yaml --parameters ParameterKey=NAME,ParameterValue="${CIRCLE_WORKFLOW_ID:0:6}"
+      - run: aws cloudformation wait stack-create-complete --stack-name "${name}"
       #- destroy 
  
   CDN:
