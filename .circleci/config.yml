@@ -69,9 +69,11 @@ workflows:
   html:
     jobs:
       - verify-old:
-          when: on_fail
-            - Bucket
-            - CDN-old
+          jobs:
+            - Bucket:
+              when: on_fail
+            - CDN-old:
+              when: on_fail
       - Bucket:
           requires:
             - verify-old
