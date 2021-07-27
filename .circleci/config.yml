@@ -36,7 +36,17 @@ jobs:
       - run: aws s3api put-object --key index.html --body index.html --acl public-read --bucket ${CIRCLE_WORKFLOW_ID:0:6}
       #- destroy 
  
-  CDN:
+  CDN-new:
+    docker:
+      - image: python:3.7
+    environment:
+      name: CDN
+    steps:
+      - checkout
+      - aws-cli/install
+      - run: aws cloudformation create-stack --stack-name ${name} --template-body file://CDN.yaml --parameters ParameterKey=PipelineId,ParameterValue=${CIRCLE_WORKFLOW_ID:0:6}
+
+  CDN-update:
     docker:
       - image: python:3.7
     environment:
@@ -58,13 +68,13 @@ jobs:
 workflows:
   html:
     jobs:
-      - verify-old
+      - verify-old:
+          when: on_fail
+            - Bucket
+            - CDN-old
       - Bucket:
           requires:
             - verify-old
-      - CDN:
-          requires:
-            - Bucket
-      - clean-old:
+      - CDN-new:
           requires:
             - Bucket
