@@ -23,8 +23,8 @@ Resources:
           Action: s3:GetObject
           Resource: !Join ['', ['arn:aws:s3:::', !Ref 'WebsiteBucket', /*]]
 
-Outputs:
-  bucketname:
-    Value: !Sub ${NAME}
-    Export:
-      Name: BucketName
+#Outputs:
+#  bucketname:
+#    Value: !Sub ${NAME}
+#    Export:
+#      Name: BucketName
