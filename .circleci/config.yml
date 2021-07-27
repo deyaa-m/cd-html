@@ -1,0 +1,36 @@
+## configurations
+version: 2.1
+
+orbs:
+  aws-cli: circleci/aws-cli@2.0.3
+
+commands:
+  destroy:
+    steps:
+      - run:
+          name: Destroy stack
+          command: aws cloudformation delete-stack --stack-name bucket
+          when: on_fail
+jobs:
+  Bucket:
+    docker:
+      - image: python:3.7
+    environment:
+      name: bucket
+    steps:
+      - checkout
+      - aws-cli/install
+      #aws cloudformation deploy --template-file bucket.yaml --stack-name bucket --parameter --parameterKey=NAME,ParameterValue=
+      - run: aws cloudformation deploy --template-file --stack-name ${name} bucket.yaml --parameters ParameterKey=NAME,ParameterValue=${CIRCLE_WORKFLOW_ID:0:6}
+      - run: aws cloudformation wait stack-create-complete --stack-name ${name}
+      - destroy 
+ 
+          
+workflows:
+  html:
+    jobs:
+      - Bucket
+      - CM:
+          requires:
+            - CF
+
