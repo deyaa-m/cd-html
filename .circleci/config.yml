@@ -26,13 +26,13 @@ jobs:
   Bucket:
     docker:
       - image: python:3.7
-    environment:
-      name: ${CIRCLE_WORKFLOW_ID:0:6}
+    #environment:
+    #  name: ${CIRCLE_WORKFLOW_ID:0:6}
     steps:
       - checkout
       - aws-cli/install
-      - run: aws cloudformation create-stack --stack-name "bucket-${name}" --template-body file://bucket.yaml --parameters ParameterKey=NAME,ParameterValue="${CIRCLE_WORKFLOW_ID:0:6}"
-      - run: aws cloudformation wait stack-create-complete --stack-name "${name}"
+      - run: aws cloudformation create-stack --stack-name "bucket-${CIRCLE_WORKFLOW_ID:0:6}" --template-body file://bucket.yaml --parameters ParameterKey=NAME,ParameterValue="${CIRCLE_WORKFLOW_ID:0:6}"
+      - run: aws cloudformation wait stack-create-complete --stack-name "bucket-${CIRCLE_WORKFLOW_ID:0:6}"
       #- destroy 
  
   CDN:
