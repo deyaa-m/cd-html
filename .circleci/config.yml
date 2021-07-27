@@ -17,9 +17,9 @@ jobs:
       - image: python:3.7
     steps:
       - aws-cli/install
-      - run: aws cloudformation list-exports --query "Exports[?Name==\`PipelineID\`].Value" --output text > ~/tmp/old-version
+      - run: aws cloudformation list-exports --query "Exports[?Name==\`PipelineID\`].Value" --output text > ~/var/old-version
       - persist_to_workspace:
-          root: ~/tmp
+          root: ~/var
           paths:
             - old-version
   Bucket:
@@ -50,8 +50,8 @@ jobs:
     steps:
       - aws-cli/install
       - attach_workspace:
-          at: ~/tmp
-      - run: aws cloudformation delete-stack --stack-name $(cat ~/tmp/old-version)
+          at: ~/var
+      - run: aws cloudformation delete-stack --stack-name $(cat ~/var/old-version)
 
 workflows:
   html:
