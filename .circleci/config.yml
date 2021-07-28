@@ -48,7 +48,7 @@ jobs:
       - run: aws cloudformation wait stack-create-complete --stack-name "bucket-${CIRCLE_WORKFLOW_ID:0:6}"
       - run: aws s3api put-object --key index.html --body index.html --acl public-read --bucket ${CIRCLE_WORKFLOW_ID:0:6}
 
-  CDN-update:
+  CDN:
     docker:
       - image: python:3.7
     environment:
