@@ -62,7 +62,7 @@ jobs:
     docker:
       - image: python:3.7
     environment:
-      bn=$(cat ~/workspace/old-version)
+      bn: $(cat ~/workspace/old-version)
     steps:
       - aws-cli/install
       - attach_workspace:
