@@ -56,7 +56,7 @@ jobs:
     steps:
       - checkout
       - aws-cli/install
-      - run: aws cloudformation deploy --stack-name ${name} --template-file CDN.yaml --parameters ParameterKey=PipelineId,ParameterValue=${CIRCLE_WORKFLOW_ID:0:6}
+      - run: aws cloudformation deploy --stack-name ${name} --template-file CDN.yaml --parameter-overrides PipelineId=${CIRCLE_WORKFLOW_ID:0:6}
 
   clean-old:
     docker:
