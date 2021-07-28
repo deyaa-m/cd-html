@@ -4,26 +4,26 @@ version: 2.1
 orbs:
   aws-cli: circleci/aws-cli@2.0.3
 
-commands:
-  new:
-    steps:
-      - checkout
-      - run:
-          name: create bucket
-          command: aws cloudformation create-stack --stack-name "bucket-${CIRCLE_WORKFLOW_ID:0:6}" --template-body file://bucket.yaml --parameters ParameterKey=NAME,ParameterValue="${CIRCLE_WORKFLOW_ID:0:6}"
-          when: on_fail
-      - run:
-          name: wait to complete
-          command: aws cloudformation wait stack-create-complete --stack-name "bucket-${CIRCLE_WORKFLOW_ID:0:6}"
-          when: on_fail
-      - run: 
-          name: copy index
-          command: aws s3api put-object --key index.html --body index.html --acl public-read --bucket ${CIRCLE_WORKFLOW_ID:0:6}
-          when: on_fail
-      - run:
-          name: create CDN
-          command: aws cloudformation create-stack --stack-name ${name} --template-body file://CDN.yaml --parameters ParameterKey=PipelineId,ParameterValue=${CIRCLE_WORKFLOW_ID:0:6}
-          when: on_fail
+#commands:
+#  new:
+#    steps:
+#      - checkout
+#      - run:
+#          name: create bucket
+#          command: aws cloudformation create-stack --stack-name "bucket-${CIRCLE_WORKFLOW_ID:0:6}" --template-body file://bucket.yaml --parameters ParameterKey=NAME,ParameterValue="${CIRCLE_WORKFLOW_ID:0:6}"
+#          when: on_fail
+#      - run:
+#          name: wait to complete
+#          command: aws cloudformation wait stack-create-complete --stack-name "bucket-${CIRCLE_WORKFLOW_ID:0:6}"
+#          when: on_fail
+#      - run: 
+#          name: copy index
+#          command: aws s3api put-object --key index.html --body index.html --acl public-read --bucket ${CIRCLE_WORKFLOW_ID:0:6}
+#          when: on_fail
+#      - run:
+#          name: create CDN
+#          command: aws cloudformation create-stack --stack-name ${name} --template-body file://CDN.yaml --parameters ParameterKey=PipelineId,ParameterValue=${CIRCLE_WORKFLOW_ID:0:6}
+#          when: on_fail
 
 jobs:
   verify-old:
@@ -37,7 +37,7 @@ jobs:
           root: ~/workspace
           paths:
             - old-version
-      - new
+      #- new
   Bucket:
     docker:
       - image: python:3.7
@@ -56,7 +56,7 @@ jobs:
     steps:
       - checkout
       - aws-cli/install
-      - run: aws cloudformation update-stack --stack-name ${name} --template-body file://CDN.yaml --parameters ParameterKey=PipelineId,ParameterValue=${CIRCLE_WORKFLOW_ID:0:6}
+      - run: aws cloudformation deploy --stack-name ${name} --template-file CDN.yaml --parameters ParameterKey=PipelineId,ParameterValue=${CIRCLE_WORKFLOW_ID:0:6}
 
   clean-old:
     docker:
@@ -74,6 +74,9 @@ workflows:
       - Bucket:
         requires:
           - verify-old
-      - CDN-new:
+      - CDN:
+          requires:
+            - Bucket
+      - clean-old:
           requires:
             - Bucket
